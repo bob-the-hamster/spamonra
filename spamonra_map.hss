@@ -1,0 +1,125 @@
+script, for each tile, callback, begin
+  variable(x, y)
+  for(y, 0, map width -- 1) do(
+    for(x, 0, map height -- 1) do(
+      run script by id(callback, x, y)
+    )
+  )
+end
+
+script, update wall, x, y, begin
+  variable(t, fb, cb, corner)
+  t := read map block(x, y, 0)
+  if(is wall(t)) then(
+    fb := get cardinal floor bits(x, y)
+    write map block(x, y, 16 + fb, 0)
+    corner := 0
+    cb := get corner floor bits(x, y)
+    cb := filter corner floor bits(cb, fb)
+    if(cb > 0) then(corner := 32 + cb)
+    write map block(x, y, corner, 1)
+  )
+end
+
+script, is wall, t, begin
+  exit returning(t >= 16 && t <= 31)
+end
+
+script, is floor, t, begin
+  exit returning(t >= 1 && t <= 15)
+end
+
+script, get cardinal floor bits, x, y, begin
+  variable(i, ox, oy, t, result)
+  for(i, 0, 3) do(
+    ox := nearby x(x, i)
+    oy := nearby y(y, i)
+    if(in map bounds(ox, oy)) then(
+      t := read map block(ox, oy, 0)
+      if(is floor(t)) then(
+        result := result ,or, 2^i
+      )
+    )
+  )
+  exit returning(result)
+end
+
+script, get corner floor bits, x, y, begin
+  variable(i, ox, oy, t, result)
+  for(i, 0, 3) do(
+    ox := corner x(x, i)
+    oy := corner y(y, i)
+    if(in map bounds(ox, oy)) then(
+      t := read map block(ox, oy, 0)
+      if(is floor(t)) then(
+        result := result ,or, 2^i
+      )
+    )
+  )
+  exit returning(result)
+end
+
+script, filter corner floor bits, cb, fb, begin
+  variable(i)
+  for(i, 0, 3) do(
+    if(get bit(fb, i) || get bit(fb, rotate(i, -1))) then(
+      cb := set bit(cb, i, false)
+    )
+  )
+  exit returning(cb)
+end
+
+script, nearby x, x, dir, begin
+  switch(dir) do(
+    case(up)    exit returning(x)
+    case(right) exit returning(x + 1)
+    case(down)  exit returning(x)
+    case(left)  exit returning(x -- 1)
+  )
+  script error(string sprintf(0, $1="Invalid direction %d", dir))
+end
+
+script, nearby y, y, dir, begin
+  switch(dir) do(
+    case(up)    exit returning(y -- 1)
+    case(right) exit returning(y)
+    case(down)  exit returning(y + 1)
+    case(left)  exit returning(y)
+  )
+  script error(string sprintf(0, $1="Invalid direction %d", dir))
+end
+
+script, corner x, x, i, begin
+  switch(i) do(
+    case(0) exit returning(x -- 1)
+    case(1) exit returning(x + 1)
+    case(2) exit returning(x + 1)
+    case(3) exit returning(x -- 1)
+  )
+  script error(string sprintf(0, $1="Invalid corner index %d", i))
+end
+
+script, corner y, y, i, begin
+  switch(i) do(
+    case(0) exit returning(y -- 1)
+    case(1) exit returning(y -- 1)
+    case(2) exit returning(y + 1)
+    case(3) exit returning(y + 1)
+  )
+  script error(string sprintf(0, $1="Invalid corner index %d", i))
+end
+
+script, in map bounds, x, y, begin
+  if(x < 0) then(exit returning(false))
+  if(y < 0) then(exit returning(false))
+  if(x >= map width) then(exit returning(false))
+  if(y >= map height) then(exit returning(false))
+  exit returning(true)
+end
+
+script, rotate, d, n=1, begin
+  d += n
+  while(d > 3) do(d -= 4)
+  while(d < 0) do(d += 4)
+  exit returning(d)
+end

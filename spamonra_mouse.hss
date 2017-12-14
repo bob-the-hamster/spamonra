@@ -1,0 +1,20 @@
+script, update cursor, begin
+  cursor x := (camera pixel x + mouse pixel x) / 20
+  cursor y := (camera pixel y + mouse pixel y) / 20
+end
+
+script, drag panning, begin
+  if(mouse click(right button)) then(
+    drag x := mouse pixel x
+    drag y := mouse pixel y
+    drag cam x := camera pixel x
+    drag cam y := camera pixel y
+  )
+  if(mouse button(right button)) then(
+    put camera(
+      drag cam x + (drag x -- mouse pixel x)
+      drag cam y + (drag y -- mouse pixel y)
+    )
+  )
+end
+

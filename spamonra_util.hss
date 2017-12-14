@@ -1,0 +1,12 @@
+
+script, get bit, v, bit, begin
+  exit returning( (v ,and, 2^bit) <> 0 )
+end
+
+script, set bit, v, bit, set, begin
+  if(set) then(
+    exit returning(v ,or, 2^bit)
+  )else(
+    exit returning(v ,and, (-1 ,xor, 2^bit))
+  )
+end

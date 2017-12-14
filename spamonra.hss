@@ -1,0 +1,36 @@
+# Crypt of Baconthulhu 2: Tomb of Spamon-Ra
+
+include, "spamonra_map.hss"
+include, "spamonra_mouse.hss"
+include, "spamonra_util.hss"
+
+global variable(1, cursor x)
+global variable(2, cursor y)
+global variable(3, drag x)
+global variable(4, drag y)
+global variable(5, drag cam x)
+global variable(6, drag cam y)
+
+plotscript, on new game, begin
+  suspend player
+  set slice visible(lookup slice(sl:walkabout sprite component, get hero slice(0)), false)
+  for each tile(@update wall)
+  main loop
+end
+
+script, main loop, begin
+  while(true) do(
+    update cursor
+    if(mouse release(left button)) then(
+      update wall(cursor x, cursor y)
+    )
+    drag panning
+    wait(1)
+  )
+end
+
+
+
+
+
+
