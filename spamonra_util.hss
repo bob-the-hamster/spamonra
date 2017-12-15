@@ -10,3 +10,26 @@ script, set bit, v, bit, set, begin
     exit returning(v ,and, (-1 ,xor, 2^bit))
   )
 end
+
+script, ahead x, x, dir, dist=1, begin
+  switch(dir) do(
+    case(left) exit returning(x -- dist)
+    case(right) exit returning(x + dist)
+  )
+  exit returning(x)
+end
+
+script, ahead y, y, dir, dist=1, begin
+  switch(dir) do(
+    case(up) exit returning(y -- dist)
+    case(down) exit returning(y + dist)
+  )
+  exit returning(y)
+end
+
+script, put camera on tile, x, y, begin
+  put camera(
+    x * 20 -- slice width(sprite layer) / 2,
+    y * 20 -- slice height(sprite layer) / 2,
+  )
+end

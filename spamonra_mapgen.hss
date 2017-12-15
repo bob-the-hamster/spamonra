@@ -1,0 +1,37 @@
+script, generate maze, begin
+  variable(start x, start y, count)
+  start x := random(1, map width -- 2)
+  start y := random(1, map height -- 2)
+  put camera on tile(start x, start y)
+  count := generate serpentine(start x, start y, 100)
+  show value(count)
+end
+
+script, generate serpentine, x, y, max length, begin
+  # Generates a serpentine path and returns its actual written length
+  variable(i, dir, count)
+  for(i, 1, max length) do(
+    write map block(x, y, 1)
+    count += 1
+    dir := pick serpentine dir(x, y)
+    x := ahead x(x, dir)
+    y := ahead y(y, dir)
+    if(not(in map bounds(x, y))) then(break)
+  )
+  exit returning(count)
+end
+
+script, pick serpentine dir, x, y, attempts=8, begin
+  # Make several attempts to choose a random direction that leads away from existing floor tiles
+  variable(i, d, ox, oy, near)
+  for(i, 1, attempts) do(
+    d := random(0, 3)
+    ox := ahead x(x, d)
+    oy := ahead y(y, d)
+    if(not(in map bounds(ox, oy))) then(continue)
+    near := nearby floor count(ox, oy)
+    if(near > 1) then(continue) 
+  )
+  exit returning(d)
+end
+

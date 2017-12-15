@@ -22,7 +22,7 @@ script, update wall, x, y, begin
 end
 
 script, is wall, t, begin
-  exit returning(t >= 16 && t <= 31)
+  exit returning(t == 0 || (t >= 16 && t <= 31))
 end
 
 script, is floor, t, begin
@@ -32,8 +32,8 @@ end
 script, get cardinal floor bits, x, y, begin
   variable(i, ox, oy, t, result)
   for(i, 0, 3) do(
-    ox := nearby x(x, i)
-    oy := nearby y(y, i)
+    ox := ahead x(x, i)
+    oy := ahead y(y, i)
     if(in map bounds(ox, oy)) then(
       t := read map block(ox, oy, 0)
       if(is floor(t)) then(
@@ -69,24 +69,17 @@ script, filter corner floor bits, cb, fb, begin
   exit returning(cb)
 end
 
-script, nearby x, x, dir, begin
-  switch(dir) do(
-    case(up)    exit returning(x)
-    case(right) exit returning(x + 1)
-    case(down)  exit returning(x)
-    case(left)  exit returning(x -- 1)
+script, nearby floor count, x, y, begin
+  variable(i, t, ox, oy, count)
+  for(i, 0, 3) do(
+    ox := ahead x(x, i)
+    oy := ahead y(y, i)
+    t := read map block(ox, oy, 0)
+    if(is floor(t)) then(
+      count += 1
+    )
   )
-  script error(string sprintf(0, $1="Invalid direction %d", dir))
-end
-
-script, nearby y, y, dir, begin
-  switch(dir) do(
-    case(up)    exit returning(y -- 1)
-    case(right) exit returning(y)
-    case(down)  exit returning(y + 1)
-    case(left)  exit returning(y)
-  )
-  script error(string sprintf(0, $1="Invalid direction %d", dir))
+  exit returning(count)
 end
 
 script, corner x, x, i, begin
