@@ -28,7 +28,8 @@ script, main loop, begin
   while(true) do(
     update cursor
     if(mouse release(left button)) then(
-      update wall(cursor x, cursor y)
+      show value(generate serpentine(cursor x, cursor y, 100))
+      for each tile(@update wall)
     )
     drag panning
     wait(1)

@@ -7,11 +7,27 @@ script, generate maze, begin
   show value(count)
 end
 
+script, debug tile, x, y, waitkey=false, begin
+  write map block(x, y, 32, 1)
+  put camera on tile(x, y)
+  variable(j)
+  for(j, 0, 3) do(
+    show string at(string sprintf(3+j, $1="%d: near=%d", j, nearby floor count(ahead x(x, j), ahead y(y, j))), 0, j * 10)
+  )
+  if(waitkey) then(
+    wait for key
+  )else(
+    wait(1)
+  )
+  write map block(x, y, 0, 1)
+end
+
 script, generate serpentine, x, y, max length, begin
   # Generates a serpentine path and returns its actual written length
   variable(i, dir, count)
   for(i, 1, max length) do(
     write map block(x, y, 1)
+    debug tile(x, y)
     count += 1
     dir := pick serpentine dir(x, y)
     x := ahead x(x, dir)
@@ -30,7 +46,7 @@ script, pick serpentine dir, x, y, attempts=8, begin
     oy := ahead y(y, d)
     if(not(in map bounds(ox, oy))) then(continue)
     near := nearby floor count(ox, oy)
-    if(near > 1) then(continue) 
+    if(near == 1) then(exit returning(d)) 
   )
   exit returning(d)
 end
