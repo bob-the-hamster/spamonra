@@ -1,0 +1,154 @@
+
+script, create array, array code, begin
+  if(not(fake array holder)) then(
+    fake array holder := lookup slice(sli:fake array holder)
+    if(not(fake array holder)) then(
+      fake array holder := create container(0, 0)
+      set slice visible(fake array holder, false)
+      set slice lookup(fake array holder, sli:fake array holder)
+    )
+  )
+  variable(a)
+  a := lookup slice(array code, fake array holder)
+  if(not(a)) then(
+    a := create container(0, 0)
+    set slice lookup(a, array code)
+    set parent(a, fake array holder)
+  )
+  exit returning(a)
+end
+
+script, clear array, a, begin
+  free slice children(a)
+end
+
+script, clear and free array of slices, a, begin
+  # When the array contains a list if slices, and we want to free them too
+  for each in array(a, @do clear and free array of slices)
+  clear array(a)
+end
+
+script, do clear and free array of slices, e, begin
+  free slice(e)
+end
+
+script, append, a, val, begin
+  variable(e)
+  e := create container(0, 0)
+  set parent(e, a)
+  set slice lookup(e, sli:array element)
+  set slice extra(e, 0, val)
+  exit returning(e)
+end
+
+script, prepend, a, val, begin
+  variable(e)
+  e := append(a, val)
+  slice to back(e)
+  exit returning(e)
+end
+
+script, drop, a, val, begin
+  # Drop all instances of value val from array a
+  variable(e, next e, v)
+  e := first child(a)
+  while(e) do(
+    next e := next sibling(e)
+    v := get slice extra(e, 0)
+    if(v == val) then(free slice(e))
+    e := next e
+  )
+end
+
+script, array length, a, begin
+  exit returning(child count(a))
+end
+
+script, in array, a, val, begin
+  variable(e, v)
+  e := first child(a)
+  while(e) do(
+    v := get slice extra(e, 0)
+    if(v == val) then(exit returning(true))
+    e := next sibling(e)
+  )
+  exit returning(false)
+end
+
+script, for each in array, a, callback, arg2=0, arg3=0, arg4=0, begin
+  variable(e, next e, v)
+  e := first child(a)
+  while(e) do(
+    next e := next sibling(e)
+    v := get slice extra(e, 0)
+    run script by id(callback, v, arg2, arg3, arg4)
+    e := next e
+  )
+end
+
+script, for each in array until true, a, callback, arg2=0, arg3=0, arg4=0, begin
+  # As soon as the callback returns true, stop looping
+  variable(e, v)
+  e := first child(a)
+  while(e) do(
+    v := get slice extra(e, 0)
+    if(run script by id(callback, v, arg2, arg3, arg4)) then(exit returning(true))
+    e := next sibling(e)
+  )
+  # Returns false if no callbacks ever return true
+  exit returning(false)
+end
+
+script, for each in array set sort order, a, callback, arg2=0, arg3=0, arg4=0, begin
+  variable(e, v, s)
+  e := first child(a)
+  while(e) do(
+    v := get slice extra(e, 0)
+    s := run script by id(callback, v, arg2, arg3, arg4)
+    set sort order(e, s)
+    e := next sibling(e)
+  )
+end
+
+script, for each in array remove if true, a, callback, arg2=0, arg3=0, arg4=0, begin
+  variable(e, next e, v)
+  e := first child(a)
+  while(e) do(
+    next e := next sibling(e)
+    v := get slice extra(e, 0)
+    if(run script by id(callback, v, arg2, arg3, arg4)) then(
+      free slice(e)
+    )
+    e := next e
+  )
+end
+
+script, fetch last, a, begin
+  variable(e)
+  e := last child(a)
+  exit returning(get slice extra(e, 0))
+end
+
+script, fetch, a, index, begin
+  variable(e)
+  e := slice child(a, index)
+  exit returning(get slice extra(e, 0))
+end
+
+script, fetch out, a, index, begin
+  variable(e, v)
+  e := slice child(a, index)
+  v := get slice extra(e, 0)
+  free slice(e)
+  exit returning(v)
+end
+
+script, trim array, a, max, begin
+  variable(e)
+  while(array length(a) > max + 1) do(
+    e := last child(a)
+    free slice(e)
+  )
+end
+
+

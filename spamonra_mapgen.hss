@@ -45,8 +45,8 @@ script, pick serpentine dir, x, y, attempts=8, begin
     ox := ahead x(x, d)
     oy := ahead y(y, d)
     if(not(in map bounds(ox, oy))) then(continue)
-    near := nearby floor count(ox, oy)
-    if(near == 1) then(exit returning(d)) 
+    near := nearby8 floor count(ox, oy)
+    if(near <= 3) then(exit returning(d)) 
   )
   exit returning(d)
 end

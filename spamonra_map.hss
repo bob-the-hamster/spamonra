@@ -82,6 +82,25 @@ script, nearby floor count, x, y, begin
   exit returning(count)
 end
 
+script, nearby8 floor count, x, y, begin
+  variable(i, t, ox, oy, count)
+  for(i, 0, 3) do(
+    ox := ahead x(x, i)
+    oy := ahead y(y, i)
+    t := read map block(ox, oy, 0)
+    if(is floor(t)) then(
+      count += 1
+    )
+    ox := corner x(x, i)
+    oy := corner y(y, i)
+    t := read map block(ox, oy, 0)
+    if(is floor(t)) then(
+      count += 1
+    )
+  )
+  exit returning(count)
+end
+
 script, corner x, x, i, begin
   switch(i) do(
     case(0) exit returning(x -- 1)

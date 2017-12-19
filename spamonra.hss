@@ -1,5 +1,6 @@
 # Crypt of Baconthulhu 2: Tomb of Spamon-Ra
 
+include, "fakearray.hsi"
 include, "spamonra_map.hss"
 include, "spamonra_mapgen.hss"
 include, "spamonra_mouse.hss"
@@ -11,6 +12,7 @@ global variable(3, drag x)
 global variable(4, drag y)
 global variable(5, drag cam x)
 global variable(6, drag cam y)
+global variable(7, fake array holder)
 
 plotscript, on new game, begin
   init game
